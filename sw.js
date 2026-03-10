@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bible-searcher-v1.020'; // Оновив версію для скидання кешу
+const CACHE_NAME = 'bible-searcher-v1.021'; // Оновив версію для скидання кешу
 
 const ASSETS = [
 'index.html',
