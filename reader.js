@@ -202,3 +202,37 @@ document.addEventListener('touchend', (e) => {
     }
     xDown = null;
 }, { passive: true });
+// ... (весь попередній код з bookMap та функціями без змін)
+
+document.getElementById('prevBtn').onclick = () => navigate(-1);
+document.getElementById('nextBtn').onclick = () => navigate(1);
+
+loadBible(); // Перший виклик для ініціалізації
+
+// --- ОБРОБКА КЛАВІАТУРИ ---
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowLeft") {
+        navigate(-1);
+    } else if (e.key === "ArrowRight") {
+        navigate(1);
+    }
+});
+
+// --- ОБРОБКА СВАЙПІВ ---
+let xDown = null;
+document.addEventListener('touchstart', (e) => {
+    xDown = e.touches[0].clientX;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+    if (!xDown) return;
+    let xUp = e.changedTouches[0].clientX;
+    let xDiff = xDown - xUp;
+    if (Math.abs(xDiff) > 100) {
+        if (xDiff > 0) navigate(1);
+        else navigate(-1);
+    }
+    xDown = null;
+}, { passive: true });
+
+loadBible(); // Повертаю другий виклик, як і було у вашому оригіналі
