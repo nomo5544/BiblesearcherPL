@@ -18,6 +18,34 @@ if (!urlParams.has('fromSearch')) {
     const exactMatch = document.getElementById('exactMatch');
     const copyRefsBtn = document.getElementById('copyRefsBtn');
     const fontSizeRange = document.getElementById('fontSizeRange');
+   
+    // 1. Оголошуємо функцію керування квадратом спочатку
+    window.updateCounterUI = (count) => {
+        if (countDisplay) {
+            countDisplay.innerText = count;
+            if (count > 0) {
+                countDisplay.classList.add('active');
+            } else {
+                countDisplay.classList.remove('active');
+            }
+        }
+    };
+
+    // 2. Оголошуємо логіку кліку
+    if (countDisplay) {
+        countDisplay.onclick = () => {
+            if (parseInt(countDisplay.innerText) > 0) {
+                searchInput.value = ""; 
+                resultsDiv.innerHTML = "";
+                window.updateCounterUI(0);
+                document.body.classList.remove('has-results');
+                sessionStorage.removeItem('lastSearchResults');
+                sessionStorage.removeItem('lastSearchQuery');
+                sessionStorage.removeItem('lastResultCount');
+                searchInput.focus();
+            }
+        };
+    }
 
     // Тепер початкова мова 'ru'
     window.currentLang = localStorage.getItem('selectedLang') || 'ru';
