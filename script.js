@@ -121,7 +121,7 @@ const maps = {
         resultsDiv.innerHTML = '';
         if (query.length < 2) { 
             document.body.classList.remove('has-results'); // Повертаємо прозорий фон
-            if (countDisplay) window.updateCounterUI(0); 
+            if (countDisplay) window.updateCounterUI(0);
             return; 
         }
         document.body.classList.add('has-results'); // Робимо фон більш щільним
