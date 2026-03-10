@@ -37,9 +37,12 @@ const bookMap = {
 
 function getTranslatedBookName(name, toLang) {
     if (toLang === 'pl') {
+        // Шукаємо польську назву (значення) за російським ключем
         return bookMap[name] || name;
     } else {
-        return Object.keys(bookMap).find(key => bookMap[key] === name) || name;
+        // Шукаємо російську назву (ключ) за польським значенням
+        const ruKey = Object.keys(bookMap).find(key => bookMap[key] === name);
+        return ruKey || name;
     }
 }
 
