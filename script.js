@@ -121,7 +121,7 @@ const maps = {
         resultsDiv.innerHTML = '';
         if (query.length < 2) { 
             document.body.classList.remove('has-results'); // Повертаємо прозорий фон
-            if (countDisplay) countDisplay.innerText = '0'; 
+            if (countDisplay) window.updateCounterUI(0); 
             return; 
         }
         document.body.classList.add('has-results'); // Робимо фон більш щільним
@@ -154,7 +154,7 @@ const maps = {
                     let displayRef = `${fullBookName} ${chapter}:${vStart}`;
                     if (match[4]) displayRef += `-${vEnd}`;
                     renderDirectResult(displayRef, combinedText);
-                    if (countDisplay) countDisplay.innerText = '1';
+                    if (countDisplay) window.updateCounterUI(1);
                     saveState();
                     return; 
                 }
@@ -197,7 +197,7 @@ const maps = {
             }
         }
         resultsDiv.appendChild(fragment);
-        if (countDisplay) countDisplay.innerText = count;
+        if (countDisplay) window.updateCounterUI(count);
         saveState();
     };
 
@@ -221,6 +221,34 @@ window.loadLanguage = function(langCode) {
                 document.body.classList.add('has-results');
                 searchInput.value = sessionStorage.getItem('lastSearchQuery') || '';
                 if (countDisplay) countDisplay.innerText = sessionStorage.getItem('lastResultCount') || '0';
+                window.updateCounterUI(parseInt(countDisplay.innerText));
+                // Логіка очищення при кліку на квадрат-лічильник
+    if (countDisplay) {
+        countDisplay.onclick = () => {
+            if (parseInt(countDisplay.innerText) > 0) {
+                searchInput.value = ""; 
+                resultsDiv.innerHTML = "";
+                window.updateCounterUI(0);
+                document.body.classList.remove('has-results');
+                sessionStorage.removeItem('lastSearchResults');
+                sessionStorage.removeItem('lastSearchQuery');
+                sessionStorage.removeItem('lastResultCount');
+                searchInput.focus();
+            }
+        };
+    }
+
+    // Допоміжна функція для керування станом квадрата
+    window.updateCounterUI = (count) => {
+        if (countDisplay) {
+            countDisplay.innerText = count;
+            if (count > 0) {
+                countDisplay.classList.add('active');
+            } else {
+                countDisplay.classList.remove('active');
+            }
+        }
+    };
                 
                 resultsDiv.querySelectorAll('.ref').forEach(el => {
                     const ref = el.innerText.replace('● ', '').trim();
