@@ -1,6 +1,6 @@
 {
-  "name": "Bible Searcher",
-  "short_name": "BS",
+  "name": "Bible Searcher PL",
+  "short_name": "BS PL",
   "description": "Зручне читання та пошук у Біблії",
   "start_url": "index.html",
   "display": "standalone",
