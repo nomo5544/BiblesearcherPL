@@ -189,8 +189,8 @@ body::before {
     <div class="header-wrapper">
         <div class="ref-header-container">
             <div class="nav-group">
-                <button class="nav-btn arrow" id="prevBtn">◄</button>
-                <button onclick="clearLastRead()" class="nav-btn search-icon">🔍</button>
+                <button class="nav-btn arrow" title="Предыдущий раздел" id="prevBtn">◄</button>
+                <button onclick="clearLastRead()" class="nav-btn title="Назад к поиску" search-icon">🔍</button>
                     <script>
                     function clearLastRead() {
                         localStorage.removeItem('lastBibleRef');
@@ -201,7 +201,7 @@ body::before {
             <div class="ref-header" id="refHeader"></div>
             <div class="nav-group">
                 <button id="langBtn" class="nav-btn">RU</button>
-                <button class="nav-btn arrow" id="nextBtn">►</button>
+                <button class="nav-btn arrow" title="Следующий раздел" id="nextBtn">►</button>
             </div>
         </div>
     </div>
