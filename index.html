@@ -191,20 +191,20 @@ body {
 
     <div class="header">
         <div class="top-bar">
-            <button id="copyRefsBtn" class="btn-ui" title="Копіювати посилання до всіх знайдених віршів">✏</button>
+            <button id="copyRefsBtn" class="btn-ui" title="Копировать ссылки всех результатов">✏</button>
             <div id="resultCount" title="Лічильник">0</div>
             
-            <input type="text" id="searchInput" placeholder="Введи слово чи посилання..." autocomplete="off" autofocus>
+            <input type="text" id="searchInput" placeholder="Введи слово или ссылку..." autocomplete="off" autofocus>
             
-            <div class="font-controls" title="Розмір шрифту">
+            <div class="font-controls" title="Розмер шрифта">
                 <input type="range" id="fontSizeRange" min="14" max="40" value="19" style="width: 100px;">
             </div>
 
-            <div id="langToggle" class="lang-button">UA</div>
+            <div id="langToggle" class="lang-button">RU</div>
             
             <label style="display: flex;">
                 <input type="checkbox" id="exactMatch">
-                <span class="toggle-label" title="Точний пошук">📚</span>
+                <span class="toggle-label" title="Точный поиск">📚</span>
             </label>
         </div>
     </div>
@@ -247,7 +247,7 @@ body {
             versionElement.innerText = match[0];
             // Функція оновлення при кліку (без візуальних змін тексту)
             versionElement.onclick = async function() {
-              if (confirm("Оновити кеш додатка та перезавантажити сторінку?")) {
+              if (confirm("Обновить кеш и перезагрузить страницу?")) {
                 const cacheNames = await caches.keys();
                 await Promise.all(cacheNames.map(name => caches.delete(name)));
                 
