@@ -56,21 +56,21 @@ if (match) {
 
 // 4. ЗАВАНТАЖЕННЯ (З виправленням назви книги під мову)
 function loadBible() {
-    const fileName = currentLang === 'pl' ? 'bibleTextPL.json' : 'bibleTextRU.json';
-    const btn = document.getElementById('langBtn');
-    if(btn) btn.innerText = currentLang.toUpperCase();
+    const fileName = currentLang === 'ru' ? 'bibleTextPL.json' : 'bibleTextRU.json';
+    const btn = document.getElementById('langBtn');
+    if(btn) btn.innerText = currentLang === 'ru' ? 'RU' : 'PL';
 
-    fetch(fileName)
-        .then(r => r.json())
-        .then(data => {
-            bibleData = data;
-            // Це ключовий момент: перед рендером ми маємо знати, яку назву книги шукати в JSON
-            renderContent();
-        })
-        .catch(err => {
-            const layout = document.getElementById('reader-layout');
-            if(layout) layout.innerHTML = "Ошибка загрузки.";
-        });
+    fetch(fileName)
+        .then(r => r.json())
+        .then(data => {
+            bibleData = data;
+            renderContent();
+        })
+        .catch(err => {
+            console.error("Ошибка:", err);
+            const layout = document.getElementById('reader-layout');
+            if(layout) layout.innerHTML = "Ошибка загрузки текста.";
+        });
 }
 
 // 5. ВІДОБРАЖЕННЯ (Універсальне до мови)
