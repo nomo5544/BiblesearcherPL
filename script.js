@@ -316,7 +316,7 @@ if (langToggle) {
             if (!refs) return;
             navigator.clipboard.writeText(refs).then(() => {
                 const old = copyRefsBtn.innerText;    
-                copyRefsBtn.innerText = '✔';
+                copyRefsBtn.innerText = '✓';
                 setTimeout(() => copyRefsBtn.innerText = old, 2000);
             });
         };
