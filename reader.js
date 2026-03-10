@@ -103,20 +103,38 @@ function renderContent() {
     const refHeader = document.getElementById('refHeader');
     if (!layout || !bibleData) return;
     
+    // --- ДОДАЙТЕ ЦІ РЯДКИ СЮДИ ---
+    // Отримуємо актуальну назву книги з URL прямо перед рендером
+    const currentUrlParams = new URLSearchParams(window.location.search);
+    const currentFullRef = decodeURIComponent(currentUrlParams.get('ref') || "");
+    const currentMatch = currentFullRef.trim().match(/^(.+?)\s+(\d+)/);
+    
+    let displayBook = bookName; // за замовчуванням
+    let displayChapter = chapterNum;
+
+    if (currentMatch) {
+        displayBook = currentMatch[1];
+        displayChapter = currentMatch[2];
+    }
+    // ----------------------------
+
     layout.style.transform = "none";
     layout.style.opacity = "1";
-    layout.classList.remove('no-transition');
-    
     layout.innerHTML = "";
-    if (refHeader) refHeader.innerText = `${bookName} ${chapterNum}`;
+    
+    if (refHeader) refHeader.innerText = `${displayBook} ${displayChapter}`;
 
-    const prefix = `${bookName} ${chapterNum}:`;
+    // Тепер шукаємо ключі саме за тією назвою, що в URL
+    const prefix = `${displayBook} ${displayChapter}:`;
     const keys = Object.keys(bibleData).filter(k => k.startsWith(prefix));
     
     keys.sort((a, b) => parseInt(a.split(':')[1]) - parseInt(b.split(':')[1]));
 
     if (keys.length === 0) {
-        layout.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">Розділ не знайдено (${bookName} ${chapterNum}).</div>`;
+        // Якщо не знайдено, виведемо що саме шукали для діагностики
+        layout.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">
+            Розділ не знайдено: ${displayBook} ${displayChapter}
+        </div>`;
         return;
     }
 
