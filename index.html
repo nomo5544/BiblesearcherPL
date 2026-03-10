@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Біблійний Пошук</title>
+    <link rel="manifest" href="app.webmanifest.json">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --header-bg: #f8f8f8;
+            --border-color: #ddd;
+            --accent-color: #1E90FF;
+            --btn-bg: #ececec;
+        }
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    
+    /* Додаємо фон */
+    background-image: url('bg.jpg'); /* Вкажіть назву свого файлу */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    /* Колір фону залишаємо як запасний */
+    background-color: var(--bg-color);
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Додаємо оверлей (напівпрозорий шар), щоб текст на фоні картинки читався чітко */
+/* Стандартний шар (до пошуку) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.6); /* Прозорість 0.6 */
+            z-index: -1;
+            transition: background-color 0.5s ease; /* Плавний перехід */
+        }
+
+        /* Шар, коли результати знайдено */
+        body.has-results::before {
+            background-color: rgba(255, 255, 255, 0.9); /* Прозорість 0.9 */
+        }
+
+        /* Посилання та вірші */
+        .ref {
+            color: #0000EE !important;
+            text-decoration: none !important;
+            cursor: pointer;
+        }
+        .ref:hover { color: #6495ED !important; }
+        .ref.clicked { color: #6495ED !important; }
+
+        .verse { 
+            display: block; 
+            margin-bottom: 6px; 
+            line-height: 1.3; 
+            text-align: justify;
+        }
+
+        /* Хедер та панель керування */
+        .header { 
+            position: sticky;
+            top: 0;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            height: 57px;
+        }
+        
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 7px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Уніфіковані кнопки (об'єднано всі повтори) */
+        .btn-ui, .lang-button, .toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            width: 40px;
+            background: var(--btn-bg);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+            user-select: none;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+        }
+
+        /* Специфічні розміри іконок */
+        #copyRefsBtn { font-size: 20px; }
+        #langToggle { font-size: 19px; }
+        .toggle-label { font-size: 22px; }
+
+        /* Поля вводу та текст */
+        input#searchInput { 
+            flex: 1;
+            min-width: 50px;
+            height: 40px;
+            padding: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+            outline: none;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        #resultCount {
+            min-width: 40px;
+            text-align: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            font-family: Arial, sans-serif;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Контейнер контенту */
+        .main-container {
+            width: 100%;
+            max-width: 920px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        h1 { 
+            text-align: center; 
+            margin: 20px 0; 
+            font-size: 1.4rem; 
+            line-height: 1.3; 
+        }
+
+        /* Перемикач "Точний пошук" */
+        #exactMatch { display: none; }
+        #exactMatch:checked + .toggle-label { 
+            background: var(--accent-color); 
+            color: white; 
+            border-color: var(--accent-color); 
+        }
+
+        mark { 
+            background-color: #FFFF99; 
+            color: #000; 
+            padding: 0 2px; 
+            border-radius: 4px; 
+        }
+
+        /* Результати пошуку */
+        #results ul { list-style: none; padding: 0; }
+        #results a, #results a:visited {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        #results a:hover { text-decoration: underline; color: #0056b3; }
+
+        /* Адаптація 📌 */
+        @media (max-width: 768px) {
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+            .verse { line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.01em; }
+            h1 { font-size: 1.1rem; line-height: 1.4; padding: 0 5px; margin: 6px 0; }
+        }
+
+        @media (max-width: 430px) {
+            .font-controls, #copyRefsBtn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="top-bar">
+            <button id="copyRefsBtn" class="btn-ui" title="Копіювати посилання до всіх знайдених віршів">✏</button>
+            <div id="resultCount" title="Лічильник">0</div>
+            
+            <input type="text" id="searchInput" placeholder="Введи слово чи посилання..." autocomplete="off" autofocus>
+            
+            <div class="font-controls" title="Розмір шрифту">
+                <input type="range" id="fontSizeRange" min="14" max="40" value="19" style="width: 100px;">
+            </div>
+
+            <div id="langToggle" class="lang-button">UA</div>
+            
+            <label style="display: flex;">
+                <input type="checkbox" id="exactMatch">
+                <span class="toggle-label" title="Точний пошук">📚</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1></h1>
+        <div id="results"></div>
+    </div>
+
+    <div style="text-align: center; padding: 20px; opacity: 0.3; font-size: 12px; font-family: sans-serif;">
+        Версія: <span id="app-version" style="cursor: pointer;">...</span>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const range = document.getElementById('fontSizeRange');
+        const results = document.getElementById('results');
+
+        if (range && results) {
+            results.style.fontSize = range.value + 'px';
+            range.addEventListener('input', (e) => {
+                results.style.fontSize = e.target.value + 'px';
+            });
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+            });
+        }
+    </script>
+    <script>
+      async function displayVersion() {
+        try {
+          const response = await fetch('sw.js');
+          const text = await response.text();
+          const match = text.match(/v\d+\.\d+/); 
+          const versionElement = document.getElementById('app-version');
+          if (match) {
+            versionElement.innerText = match[0];
+            // Функція оновлення при кліку (без візуальних змін тексту)
+            versionElement.onclick = async function() {
+              if (confirm("Оновити кеш додатка та перезавантажити сторінку?")) {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                  await registration.unregister();
+                }
+                window.location.reload(true);
+              }
+            };
+          }
+        } catch (e) {
+          console.log("Помилка отримання версії");
+        }
+      }
+      displayVersion();
+    </script>
+</body>
+</html>
