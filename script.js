@@ -255,7 +255,7 @@ if (langToggle) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const query = searchInput.value.trim();
-                const match = query.match(/^(\d?\s?[A-Za-zА-Яа-яІіЇЄєҐҐąćęłńóśźżĄĆĘŁŃÓŚŹŻыЫэЭёЁ][a-zA-Zа-яіїєґ'ąćęłńóśźżыэё\s]{0,20})\s*[\s\.\:]\s*(\d+)(?:[\s\:\.\-]+(\d+)(?:\-(\d+))?)?$/;);
+                const match = query.match(/^(\d?\s?[A-Za-zА-Яа-яІіЇЄєҐҐąćęłńóśźżĄĆĘŁŃÓŚŹŻыЫэЭёЁ][a-zA-Zа-яіїєґ'ąćęłńóśźżыэё\s]{0,20})\s*[\s\.\:]\s*(\d+)(?:[\s\:\.\-]+(\d+)(?:\-(\d+))?)?$/);
                 if (match) {
                     const book = maps[window.currentLang][match[1].trim().toLowerCase().replace(/\.$/, "")];
                     if (book) {
