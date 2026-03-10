@@ -1,16 +1,16 @@
 const CACHE_NAME = 'bible-searcher-v1.012'; // Оновив версію для скидання кешу
 
 const ASSETS = [
-  'index.html',
+'index.html',
   'reader.html',
+  'script.js',
   'reader.js',
-  'script.js',      // Додав ваш основний скрипт
-  'app.webmanifest.json',
-  'bibleTextUA.json',
-  'bibleTextRU.json',
+  'manifest.json',      // Переконайтеся, що назва збігається з вашим файлом
+  'bg.jpg',
+  'bibleTextRU.json',    // Додано
+  'bibleTextPL.json',    // Додано
   'icon-192.png',
-  'icon-512.png',
-  'bg.jpg'
+  'icon-512.png'
 ];
 
 // 1. Встановлення
