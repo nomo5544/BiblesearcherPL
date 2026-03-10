@@ -117,65 +117,47 @@ function renderContent() {
         return;
     }
 
-    keys.forEach(key => {
+keys.forEach(key => {
         const vNum = parseInt(key.split(':')[1]);
-        
-        let isHighlighted = false;
-        if (vStart !== null) {
-            isHighlighted = (vNum >= vStart && vNum <= vEnd);
-        }
+        let isHighlighted = (vStart !== null && vNum >= vStart && vNum <= vEnd);
         
         const div = document.createElement('div');
         div.className = `verse-item ${isHighlighted ? 'highlight' : ''}`;
-        
-        if (vStart !== null && vNum === vStart) {
-            div.id = "target";
-        }
+        if (vStart !== null && vNum === vStart) div.id = "target";
         
         const spanNum = document.createElement('span');
         spanNum.className = 'verse-num';
         spanNum.innerText = vNum;
 
         const textNode = document.createTextNode(" " + bibleData[key]); 
-
         div.appendChild(spanNum);
         div.appendChild(textNode);
         
-    let pressTimer;
+        let pressTimer;
+        const startPress = (e) => {
+            div.classList.add('pressing');
+            pressTimer = setTimeout(() => {
+                if (navigator.vibrate) navigator.vibrate(40);
+                div.classList.replace('pressing', 'shared-flash');
+                shareVerse(bibleData[key], `${bookName} ${chapterNum}:${vNum}`);
+                setTimeout(() => div.classList.remove('shared-flash'), 1000);
+            }, 800);
+        };
 
-    const startPress = (e) => {
-        div.classList.add('pressing');
-
-        pressTimer = setTimeout(() => {
-            if (navigator.vibrate) navigator.vibrate(40);
-            div.classList.replace('pressing', 'shared-flash');
-            
-            const text = bibleData[key];
-            const ref = `${bookName} ${chapterNum}:${vNum}`;
-            shareVerse(text, ref);
-
-            setTimeout(() => div.classList.remove('shared-flash'), 1000);
-        }, 800);
-    };
-
-    const cancelPress = () => {
-        clearTimeout(pressTimer);
-        div.classList.remove('pressing');
-        if (!div.classList.contains('shared-flash')) {
+        const cancelPress = () => {
+            clearTimeout(pressTimer);
             div.classList.remove('pressing');
-        }
-    };
+        };
 
-    div.addEventListener('touchstart', startPress, { passive: true });
-    div.addEventListener('touchend', cancelPress, { passive: true });
-    div.addEventListener('touchmove', cancelPress, { passive: true });
-    
-    div.addEventListener('mousedown', startPress);
-    div.addEventListener('mouseup', cancelPress);
-    div.addEventListener('mouseleave', cancelPress);
+        div.addEventListener('touchstart', startPress, { passive: true });
+        div.addEventListener('touchend', cancelPress, { passive: true });
+        div.addEventListener('touchmove', cancelPress, { passive: true });
+        div.addEventListener('mousedown', startPress);
+        div.addEventListener('mouseup', cancelPress);
+        div.addEventListener('mouseleave', cancelPress);
 
-    layout.appendChild(div);
-});
+        layout.appendChild(div);
+    }); // <--- ПЕРЕВІР ЦЮ ДУЖКУ
 
     if (vStart !== null) {
         setTimeout(() => {
@@ -183,7 +165,7 @@ function renderContent() {
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 600);
     }
-}
+} // КІНЕЦЬ renderContent
 
 document.getElementById('langBtn').onclick = () => {
     const nextLang = currentLang === 'pl' ? 'ru' : 'pl';
