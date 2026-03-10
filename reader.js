@@ -38,201 +38,215 @@ const bookMap = {
 };
 
 function getTranslatedBookName(name, toLang) {
-    if (toLang === 'pl') {
-        return bookMap[name] || name;
-    } else {
-        // Пошук російської назви за польським значенням
-        return Object.keys(bookMap).find(key => bookMap[key] === name) || name;
-    }
+    if (toLang === 'rus') {
+        return bookMap[name] || name;
+    } else {
+        return Object.keys(bookMap).find(key => bookMap[key] === name) || name;
+    }
 }
 
-// Розбір посилання (без змін)
+// Розбір посилання
 let bookName = "", chapterNum = "1", vStart = null, vEnd = null;
+
+// Регулярний вираз для підтримки діапазонів (напр. Мат 3:1-11)
 const match = fullRef.trim().match(/^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$/);
 
 if (match) {
-    bookName = match[1];
-    chapterNum = match[2];
-    vStart = match[3] ? parseInt(match[3]) : null;
-    vEnd = match[4] ? parseInt(match[4]) : vStart;
+    bookName = match[1];
+    chapterNum = match[2];
+    vStart = match[3] ? parseInt(match[3]) : null;
+    vEnd = match[4] ? parseInt(match[4]) : vStart; // Якщо діапазону немає, vEnd = vStart
 }
 
-// Функція поділитися (заголовок тепер російською)
 async function shareVerse(text, ref) {
-    const shareText = `«${text}» (${ref})\n\n`;
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: 'Библия',
-                text: shareText
-            });
-        } catch (err) { console.log("Отменено"); }
-    } else {
-        try {
-            await navigator.clipboard.writeText(shareText);
-            alert("Текст скопирован!");
-        } catch (err) { console.error("Ошибка копирования"); }
-    }
+    // Формуємо чистий текст без посилання 
+    const shareText = `«${text}» (${ref})\n\n`;
+    
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Біблія',
+                text: shareText
+            });
+        } catch (err) {
+            console.log("Скасовано");
+        }
+    } else {
+        try {
+            await navigator.clipboard.writeText(shareText);
+            alert("Текст скопійовано!");
+        } catch (err) {
+            console.error("Помилка копіювання");
+        }
+    }
 }
 
 function loadBible() {
-    // Зміна назв файлів на RU та PL
-    const fileName = currentLang === 'ru' ? 'bibleTextRU.json' : 'bibleTextPL.json';
-    const btn = document.getElementById('langBtn');
-    if(btn) btn.innerText = currentLang === 'ru' ? 'RU' : 'PL';
+    const fileName = currentLang === 'ukr' ? 'bibleTextUA.json' : 'bibleTextRU.json';
+    const btn = document.getElementById('langBtn');
+    if(btn) btn.innerText = currentLang === 'ukr' ? 'UA' : 'RU';
 
-    fetch(fileName)
-        .then(r => r.json())
-        .then(data => {
-            bibleData = data;
-            renderContent();
-        })
-        .catch(err => {
-            console.error("Ошибка:", err);
-            const layout = document.getElementById('reader-layout');
-            if(layout) layout.innerHTML = "Ошибка загрузки текста.";
-        });
+    fetch(fileName)
+        .then(r => r.json())
+        .then(data => {
+            bibleData = data;
+            renderContent();
+        })
+        .catch(err => {
+            console.error("Помилка:", err);
+            const layout = document.getElementById('reader-layout');
+            if(layout) layout.innerHTML = "Помилка завантаження тексту.";
+        });
 }
 
 function renderContent() {
-    const layout = document.getElementById('reader-layout');
-    const refHeader = document.getElementById('refHeader');
-    if (!layout || !bibleData) return;
-    
-    layout.style.transform = "none";
-    layout.style.opacity = "1";
-    layout.classList.remove('no-transition');
-    layout.innerHTML = "";
-    
-    if (refHeader) refHeader.innerText = `${bookName} ${chapterNum}`;
+    const layout = document.getElementById('reader-layout');
+    const refHeader = document.getElementById('refHeader');
+    if (!layout || !bibleData) return;
+    
+    layout.style.transform = "none";
+    layout.style.opacity = "1";
+    layout.classList.remove('no-transition');
+    
+    layout.innerHTML = "";
+    if (refHeader) refHeader.innerText = `${bookName} ${chapterNum}`;
 
-    const prefix = `${bookName} ${chapterNum}:`;
-    const keys = Object.keys(bibleData).filter(k => k.startsWith(prefix));
-    keys.sort((a, b) => parseInt(a.split(':')[1]) - parseInt(b.split(':')[1]));
+    const prefix = `${bookName} ${chapterNum}:`;
+    const keys = Object.keys(bibleData).filter(k => k.startsWith(prefix));
+    
+    keys.sort((a, b) => parseInt(a.split(':')[1]) - parseInt(b.split(':')[1]));
 
-    if (keys.length === 0) {
-        layout.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">Глава не найдена (${bookName} ${chapterNum}).</div>`;
-        return;
-    }
+    if (keys.length === 0) {
+        layout.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">Розділ не знайдено (${bookName} ${chapterNum}).</div>`;
+        return;
+    }
 
-    keys.forEach(key => {
-        const vNum = parseInt(key.split(':')[1]);
-        let isHighlighted = (vStart !== null && vNum >= vStart && vNum <= vEnd);
-        
-        const div = document.createElement('div');
-        div.className = `verse-item ${isHighlighted ? 'highlight' : ''}`;
-        if (vStart !== null && vNum === vStart) div.id = "target";
-        
-        const spanNum = document.createElement('span');
-        spanNum.className = 'verse-num';
-        spanNum.innerText = vNum;
+    keys.forEach(key => {
+        const vNum = parseInt(key.split(':')[1]);
+        
+        // ПЕРЕВІРКА ДІАПАЗОНУ
+        let isHighlighted = false;
+        if (vStart !== null) {
+            isHighlighted = (vNum >= vStart && vNum <= vEnd);
+        }
+        
+        const div = document.createElement('div');
+        div.className = `verse-item ${isHighlighted ? 'highlight' : ''}`;
+        
+        // Ставимо ID для скролу тільки на перший вірш виділення
+        if (vStart !== null && vNum === vStart) {
+            div.id = "target";
+        }
+        
+        const spanNum = document.createElement('span');
+        spanNum.className = 'verse-num';
+        spanNum.innerText = vNum;
 
-        const textNode = document.createTextNode(" " + bibleData[key]); 
-        div.appendChild(spanNum);
-        div.appendChild(textNode);
-        
-        let pressTimer;
-        const startPress = () => {
-            div.classList.add('pressing');
-            pressTimer = setTimeout(() => {
-                if (navigator.vibrate) navigator.vibrate(40);
-                div.classList.replace('pressing', 'shared-flash');
-                shareVerse(bibleData[key], `${bookName} ${chapterNum}:${vNum}`);
-                setTimeout(() => div.classList.remove('shared-flash'), 1000);
-            }, 800);
-        };
+        const textNode = document.createTextNode(" " + bibleData[key]); 
 
-        const cancelPress = () => {
-            clearTimeout(pressTimer);
-            div.classList.remove('pressing');
-        };
+        div.appendChild(spanNum);
+        div.appendChild(textNode);
+        
+    let pressTimer;
 
-        div.addEventListener('touchstart', startPress, { passive: true });
-        div.addEventListener('touchend', cancelPress, { passive: true });
-        div.addEventListener('mousedown', startPress);
-        div.addEventListener('mouseup', cancelPress);
-        layout.appendChild(div);
-    });
+    const startPress = (e) => {
+        // Додаємо візуальний клас "натискання"
+        div.classList.add('pressing');
 
-    if (vStart !== null) {
-        setTimeout(() => {
-            const el = document.getElementById('target');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 600);
-    }
+        pressTimer = setTimeout(() => {
+            // Ефект успіху: вібрація + спалах
+            if (navigator.vibrate) navigator.vibrate(40); // Короткий "тік"
+            div.classList.replace('pressing', 'shared-flash');
+            
+            const text = bibleData[key];
+            const ref = `${bookName} ${chapterNum}:${vNum}`;
+            shareVerse(text, ref);
+
+            // Прибираємо підсвітку через секунду
+            setTimeout(() => div.classList.remove('shared-flash'), 1000);
+        }, 800); // Час утримання
+    };
+
+    const cancelPress = () => {
+        clearTimeout(pressTimer);
+        div.classList.remove('pressing');
+        if (!div.classList.contains('shared-flash')) {
+            div.classList.remove('pressing');
+        }
+    };
+
+    // Слухачі подій
+    div.addEventListener('touchstart', startPress, { passive: true });
+    div.addEventListener('touchend', cancelPress, { passive: true });
+    div.addEventListener('touchmove', cancelPress, { passive: true });
+    
+    // Для мишки (ПК)
+    div.addEventListener('mousedown', startPress);
+    div.addEventListener('mouseup', cancelPress);
+    div.addEventListener('mouseleave', cancelPress);
+
+    layout.appendChild(div);
+});
+
+// СКРОЛ ДО ПОЧАТКУ ВИДІЛЕННЯ
+    if (vStart !== null) {
+        setTimeout(() => {
+            const el = document.getElementById('target');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 600);
+    }
 }
 
-// Оновлений перемикач RU <-> PL
 document.getElementById('langBtn').onclick = () => {
-    const nextLang = currentLang === 'ru' ? 'pl' : 'ru';
-    const translatedBook = getTranslatedBookName(bookName, nextLang);
-    
-    let versePart = vStart ? `:${vStart}${vEnd !== vStart ? '-' + vEnd : ''}` : "";
-    const newRef = `${translatedBook} ${chapterNum}${versePart}`;
-    
-    window.location.href = `reader.html?ref=${encodeURIComponent(newRef)}&lang=${nextLang}`;
+    const nextLang = currentLang === 'ukr' ? 'rus' : 'ukr';
+    const translatedBook = getTranslatedBookName(bookName, nextLang);
+    
+    // Формуємо частину з віршами (діапазон або один вірш)
+    let versePart = "";
+    if (vStart) {
+        versePart = `:${vStart}${vEnd !== vStart ? '-' + vEnd : ''}`;
+    }
+    
+    const newRef = `${translatedBook} ${chapterNum}${versePart}`;
+    window.location.href = `reader.html?ref=${encodeURIComponent(newRef)}&lang=${nextLang}`;
 };
 
 function navigate(step) {
-    const nextChap = parseInt(chapterNum) + step;
-    if (nextChap < 1) return;
-    window.location.href = `reader.html?ref=${encodeURIComponent(bookName + ' ' + nextChap)}&lang=${currentLang}`;
+    const nextChap = parseInt(chapterNum) + step;
+    if (nextChap < 1) return;
+    window.location.href = `reader.html?ref=${encodeURIComponent(bookName + ' ' + nextChap)}&lang=${currentLang}`;
 }
 
 document.getElementById('prevBtn').onclick = () => navigate(-1);
 document.getElementById('nextBtn').onclick = () => navigate(1);
 
-// Видалено подвійний виклик loadBible()
 loadBible();
-
-// --- ОБРОБКА КЛАВІАТУРИ ТА СВАЙПІВ (БЕЗ ЗМІН) ---
-document.addEventListener('keydown', (e) => {
-    if (e.key === "ArrowLeft") navigate(-1);
-    else if (e.key === "ArrowRight") navigate(1);
-});
-
-let xDown = null;
-document.addEventListener('touchstart', (e) => { xDown = e.touches[0].clientX; }, { passive: true });
-document.addEventListener('touchend', (e) => {
-    if (!xDown) return;
-    let xDiff = xDown - e.changedTouches[0].clientX;
-    if (Math.abs(xDiff) > 100) {
-        if (xDiff > 0) navigate(1);
-        else navigate(-1);
-    }
-    xDown = null;
-}, { passive: true });
-// ... (весь попередній код з bookMap та функціями без змін)
-
-document.getElementById('prevBtn').onclick = () => navigate(-1);
-document.getElementById('nextBtn').onclick = () => navigate(1);
-
-loadBible(); // Перший виклик для ініціалізації
-
 // --- ОБРОБКА КЛАВІАТУРИ ---
 document.addEventListener('keydown', (e) => {
-    if (e.key === "ArrowLeft") {
-        navigate(-1);
-    } else if (e.key === "ArrowRight") {
-        navigate(1);
-    }
+    if (e.key === "ArrowLeft") {
+        navigate(-1); // Попередній розділ
+    } else if (e.key === "ArrowRight") {
+        navigate(1);  // Наступний розділ
+    }
 });
-
-// --- ОБРОБКА СВАЙПІВ ---
+// --- ОБРОБКА СВАЙПІВ (Мобільні) ---
 let xDown = null;
+
 document.addEventListener('touchstart', (e) => {
-    xDown = e.touches[0].clientX;
+    xDown = e.touches[0].clientX;
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
-    if (!xDown) return;
-    let xUp = e.changedTouches[0].clientX;
-    let xDiff = xDown - xUp;
-    if (Math.abs(xDiff) > 100) {
-        if (xDiff > 0) navigate(1);
-        else navigate(-1);
-    }
-    xDown = null;
+    if (!xDown) return;
+    let xUp = e.changedTouches[0].clientX;
+    let xDiff = xDown - xUp;
+
+    // Тільки якщо палець пройшов більше 100 пікселів
+    if (Math.abs(xDiff) > 100) {
+        if (xDiff > 0) navigate(1);  // Наступний
+        else navigate(-1);           // Попередній
+    }
+    xDown = null;
 }, { passive: true });
 
-loadBible(); // Повертаю другий виклик, як і було у вашому оригіналі
+loadBible();
