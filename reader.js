@@ -12,27 +12,27 @@ if (fullRef) {
 
 const bookMap = {
     "Бытие": "Rodzaju", "Исход": "Wyjścia", "Левит": "Kapłańska", "Числа": "Liczb", 
-    "Второзаконие": "Powtórzonego Prawa", "Иисус Навин": "Jozuego", "Судьи": "Sędziów", 
-    "Руфь": "Rut", "1 Царств": "1 Samuela", "2 Царств": "2 Samuela", 
-    "3 Царств": "1 Królewska", "4 Царств": "2 Królewska", "1 Паралипоменон": "1. Kronik", 
+    "Второзаконие": "Powtórzonego", "Иисус Навин": "Jozuego", "Судьи": "Sędziów", 
+    "Руфь": "Ruty", "1 Царств": "1 Samuelowa", "2 Царств": "2 Samuelowa", 
+    "3 Царств": "1 Królewska", "4 Царств": "2 Królewska", "1 Паралипоменон": "1 Kronik", 
     "2 Паралипоменон": "2 Kronik", "Ездра": "Ezdrasza", "Неемия": "Nehemiasza", 
     "Есфирь": "Estery", "Иов": "Hioba", "Псалтирь": "Psalmów", "Притчи": "Przysłów", 
-    "Екклезиаст": "Koheleta", "Песнь Песней": "Pieśń над Pieśniami", "Исаия": "Izajasza", 
+    "Екклезиаст": "Koheleta", "Песнь Песней": "Pieśń", "Исаия": "Izajasza", 
     "Иеремия": "Jeremiasza", "Плач Иеремии": "Lamentacje", "Иезекииль": "Ezechiela", 
-    "Даниил": "Daniela", "Осия": "Ozeasza", "Иоиль": "Joela", "Амос": "Amosa", 
-    "Авдий": "Abdiariasza", "Иона": "Jonasza", "Михей": "Micheasza", "Наум": "Nahuma", 
+    "Даниил": "Daniela", "Осия": "Ozeasza", "Иоиль": "Joel", "Амос": "Amos", 
+    "Авдий": "Abdiasza", "Иона": "Jonasza", "Михей": "Micheasza", "Наум": "Nahuma", 
     "Аввакум": "Habakuka", "Софония": "Sofoniasza", "Аггей": "Aggeusza", 
     "Захария": "Zachariasza", "Малахия": "Malachiasza",
     "Матфея": "Mateusza", "Марка": "Marka", "Луки": "Łukasza", 
-    "Иоанна": "Jana", "Деяния": "Dzieje Apostolskie", "Римлянам": "Rzymian", 
-    "1 Коринфянам": "1. Koryntów", "2 Коринфянам": "2. Koryntów", 
+    "Иоанна": "Jana", "Деяния": "Dzieje", "Римлянам": "Rzymian", 
+    "1 Коринфянам": "1 Koryntian", "2 Коринфянам": "2 Koryntian", 
     "Галатам": "Galatów", "Ефесянам": "Efezjan", "Филиппийцам": "Filipian", 
     "Колоссянам": "Kolosan", "1 Фессалоникийцам": "1 Tesaloniczan", 
     "2 Фессалоникийцам": "2 Tesaloniczan", "1 Тимофею": "1 Tymoteusza", 
     "2 Тимофею": "2 Tymoteusza", "Титу": "Tytusa", "Филимону": "Filemona", 
     "Евреям": "Hebrajczyków", "Иакова": "Jakuba", "1 Петра": "1 Piotra", 
     "2 Петра": "2 Piotra", "1 Иоанна": "1 Jana", "2 Иоанна": "2 Jana", 
-    "3 Иоанна": "3 Jana", "Иуды": "Judy", "Откровение": "Apokalipsa"
+    "3 Иоанна": "3 Jana", "Иуды": "Judy", "Откровение": "Objawienie"
 };
 
 function getTranslatedBookName(name, toLang) {
