@@ -171,14 +171,19 @@ keys.forEach(key => {
 } // КІНЕЦЬ renderContent
 
 document.getElementById('langBtn').onclick = () => {
-    const nextLang = currentLang === 'pl' ? 'ru' : 'pl';
+    // Визначаємо наступну мову (якщо була ru -> буде pl, і навпаки)
+    const nextLang = currentLang === 'ru' ? 'pl' : 'ru';
+    
+    // Отримуємо перекладену назву книги
     const translatedBook = getTranslatedBookName(bookName, nextLang);
     
+    // Формуємо частину з віршами (твій оригінальний код)
     let versePart = "";
     if (vStart) {
         versePart = `:${vStart}${vEnd !== vStart ? '-' + vEnd : ''}`;
     }
     
+    // Формуємо нове посилання та переходимо
     const newRef = `${translatedBook} ${chapterNum}${versePart}`;
     window.location.href = `reader.html?ref=${encodeURIComponent(newRef)}&lang=${nextLang}`;
 };
