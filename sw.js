@@ -5,7 +5,7 @@ const ASSETS = [
   'reader.html',
   'script.js',
   'reader.js',
-  'manifest.json',      // Переконайтеся, що назва збігається з вашим файлом
+  'app.webmanifest',      // Переконайтеся, що назва збігається з вашим файлом
   'bg.jpg',
   'bibleTextRU.json',    // Додано
   'bibleTextPL.json',    // Додано
