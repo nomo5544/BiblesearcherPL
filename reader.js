@@ -84,7 +84,7 @@ async function shareVerse(text, ref) {
 function loadBible() {
     const fileName = currentLang === 'ukr' ? 'bibleTextUA.json' : 'bibleTextRU.json';
     const btn = document.getElementById('langBtn');
-    if(btn) btn.innerText = currentLang === 'ukr' ? 'UA' : 'RU';
+    if(btn) btn.innerText = currentLang === 'rus' ? 'PL' : 'RU';
 
     fetch(fileName)
         .then(r => r.json())
@@ -93,7 +93,7 @@ function loadBible() {
             renderContent();
         })
         .catch(err => {
-            console.error("Помилка:", err);
+            console.error("Ошибка:", err);
             const layout = document.getElementById('reader-layout');
             if(layout) layout.innerHTML = "Помилка завантаження тексту.";
         });
@@ -117,7 +117,7 @@ function renderContent() {
     keys.sort((a, b) => parseInt(a.split(':')[1]) - parseInt(b.split(':')[1]));
 
     if (keys.length === 0) {
-        layout.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">Розділ не знайдено (${bookName} ${chapterNum}).</div>`;
+        layout.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.5;">Главу не найдено (${bookName} ${chapterNum}).</div>`;
         return;
     }
 
@@ -198,7 +198,7 @@ function renderContent() {
 }
 
 document.getElementById('langBtn').onclick = () => {
-    const nextLang = currentLang === 'ukr' ? 'rus' : 'ukr';
+    const nextLang = currentLang === 'rus' ? 'pl' : 'rus';
     const translatedBook = getTranslatedBookName(bookName, nextLang);
     
     // Формуємо частину з віршами (діапазон або один вірш)
